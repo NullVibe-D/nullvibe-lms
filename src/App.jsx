@@ -1,22 +1,26 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   BookOpen,
   SquaresFour,
   Sparkle,
-  SlidersHorizontal,
-  ArrowRight,
   Globe,
   GraduationCap,
+  ArrowUpRight,
 } from "@phosphor-icons/react";
 import { Lesson, Assessment } from "./Learning";
 import { Catalog, Studio, Mentor, AccessDialog } from "./Workspace";
+import {
+  defaultConfig,
+  sanitizeConfig,
+  sanitizeProgress,
+  sanitizeResult,
+} from "./domain.mjs";
+import { parseRoute, routeHash } from "./navigation.mjs";
 import "./workspace.css";
-import { sanitizeConfig, sanitizeProgress } from "./domain.mjs";
 
 export function translate(language, english, sinhala, japanese) {
   return { en: english, si: sinhala, ja: japanese }[language] || english;
 }
-
 function readStored(key, fallback) {
   try {
     return JSON.parse(localStorage.getItem(key)) ?? fallback;
@@ -24,74 +28,143 @@ function readStored(key, fallback) {
     return fallback;
   }
 }
-
 export function useStored(key, initial) {
   const [value, setValue] = useState(() => readStored(key, initial));
+  const [canSave, setCanSave] = useState(true);
   useEffect(() => {
     try {
       localStorage.setItem(key, JSON.stringify(value));
+      setCanSave(true);
     } catch {
-      /* Storage can be unavailable in private browsing. */
+      setCanSave(false);
     }
   }, [key, value]);
-  return [value, setValue];
+  return [value, setValue, canSave];
 }
 
 export function App() {
-  const [savedLanguage, setLanguage] = useStored("nullvibe.language", "en");
+  const [savedLanguage, setLanguage, languageSaved] = useStored(
+    "nullvibe.language",
+    "en",
+  );
   const language = ["en", "si", "ja"].includes(savedLanguage)
     ? savedLanguage
     : "en";
   const t = (en, si, ja) => translate(language, en, si, ja);
-  const [view, setView] = useState("lesson");
-  const [courseId, setCourseId] = useState("N5");
-  const [savedCompleted, setCompleted] = useStored("nullvibe.progress", []);
+  const [route, setRoute] = useState(() => parseRoute(location.hash));
+  const [lastCourse, setLastCourse] = useStored("nullvibe.course", "N5");
+  const courseId =
+    route.courseId || (["N5", "N4"].includes(lastCourse) ? lastCourse : "N5");
+  const { view } = route;
+  const [savedCompleted, setCompleted, progressSaved] = useStored(
+    "nullvibe.progress",
+    [],
+  );
   const completedIds = sanitizeProgress(savedCompleted);
-  const [lastResult, setResult] = useStored("nullvibe.result", null);
+  const [savedResult, setResult] = useStored("nullvibe.result", null);
+  const lastResult = sanitizeResult(savedResult);
   const [accessCourse, setAccessCourse] = useState(null);
   const [mentorOpen, setMentorOpen] = useState(false);
-  const [config, setConfig] = useStored("nullvibe.settings.v1", {
-    N5: {
-      priceLkr: null,
-      accessDays: null,
-      liveClasses: null,
-      mediaHours: null,
-    },
-    N4: {
-      priceLkr: null,
-      accessDays: null,
-      liveClasses: null,
-      mediaHours: null,
-    },
-  });
+  const [config, setConfig, configSaved] = useStored(
+    "nullvibe.settings.v1",
+    defaultConfig,
+  );
   const safeConfig = sanitizeConfig(config);
+  const canSave = languageSaved && progressSaved && configSaved;
+  const previousRoute = useRef(view + courseId);
 
   useEffect(() => {
-    document.documentElement.lang = language;
-  }, [language]);
-  function navigate(next) {
-    setView(next);
+    const update = () => {
+      setRoute(parseRoute(location.hash));
+      setMentorOpen(false);
+      setAccessCourse(null);
+    };
+    window.addEventListener("popstate", update);
+    window.addEventListener("hashchange", update);
+    return () => {
+      window.removeEventListener("popstate", update);
+      window.removeEventListener("hashchange", update);
+    };
+  }, []);
+  useEffect(() => {
+    if (route.courseId) setLastCourse(route.courseId);
+  }, [route.courseId, setLastCourse]);
+  useEffect(() => {
+    if (previousRoute.current === view + courseId) return;
+    previousRoute.current = view + courseId;
     window.scrollTo({ top: 0, behavior: "instant" });
-    requestAnimationFrame(() => document.querySelector("main h1")?.focus());
+    document.querySelector("main h1")?.focus({ preventScroll: true });
+  }, [view, courseId]);
+  useEffect(() => {
+    document.documentElement.lang = language;
+    const titles = {
+      courses: t("Learn Japanese", "ජපන් ඉගෙන ගන්න", "日本語を学ぶ"),
+      lesson: t("My learning", "මගේ ඉගෙනීම", "学習") + " · " + courseId,
+      practice: t("Practice", "පුහුණුව", "練習") + " · " + courseId,
+      studio: t("Course studio", "පාඨමාලා සැකසුම්", "コース設定"),
+    };
+    document.title = titles[view] + " | NullVibe";
+  }, [language, view, courseId]);
+
+  function navigate(next, id = courseId) {
+    const hash = routeHash(next, id);
+    if (location.hash !== hash) history.pushState(null, "", hash);
+    setRoute(parseRoute(hash));
+    setMentorOpen(false);
+    setAccessCourse(null);
   }
   function startCourse(id) {
-    setCourseId(id);
-    setAccessCourse(null);
-    navigate("lesson");
+    navigate("lesson", id);
   }
   function markComplete(id) {
-    setCompleted((previous) => [
-      ...new Set([...(Array.isArray(previous) ? previous : []), id]),
-    ]);
+    setCompleted((previous) =>
+      sanitizeProgress([...sanitizeProgress(previous), id]),
+    );
   }
   const navItems = [
     ["courses", SquaresFour, t("Courses", "පාඨමාලා", "コース")],
     ["lesson", BookOpen, t("My learning", "මගේ ඉගෙනීම", "学習")],
     ["practice", GraduationCap, t("Practice", "පුහුණුව", "練習")],
   ];
+  const navLinks = (mobile = false) =>
+    navItems.map(([id, Icon, label]) => (
+      <a
+        key={id}
+        href={routeHash(id, courseId)}
+        className={view === id ? (mobile ? "active" : "selected") : ""}
+        aria-current={view === id ? "page" : undefined}
+        onClick={(event) => {
+          if (
+            event.button === 0 &&
+            !event.metaKey &&
+            !event.ctrlKey &&
+            !event.shiftKey &&
+            !event.altKey
+          ) {
+            event.preventDefault();
+            navigate(id);
+          }
+        }}
+      >
+        <Icon
+          size={19}
+          weight={mobile && view === id ? "fill" : "regular"}
+          aria-hidden="true"
+        />
+        {label}
+      </a>
+    ));
+
   return (
     <div className="app-shell">
-      <a className="skip-link" href="#main-content">
+      <a
+        className="skip-link"
+        href="#main-content"
+        onClick={(event) => {
+          event.preventDefault();
+          document.querySelector("main h1")?.focus();
+        }}
+      >
         {t("Skip to content", "අන්තර්ගතයට යන්න", "本文へ")}
       </a>
       <header className="app-header">
@@ -101,7 +174,7 @@ export function App() {
           aria-label="NullVibe home"
         >
           <span className="brand-mark">
-            <BookOpen weight="duotone" />
+            <BookOpen weight="duotone" aria-hidden="true" />
           </span>
           <span>
             <strong>NullVibe</strong>
@@ -116,21 +189,11 @@ export function App() {
             "メインナビゲーション",
           )}
         >
-          {navItems.map(([id, Icon, label]) => (
-            <button
-              key={id}
-              className={view === id ? "selected" : ""}
-              aria-current={view === id ? "page" : undefined}
-              onClick={() => navigate(id)}
-            >
-              <Icon size={19} />
-              {label}
-            </button>
-          ))}
+          {navLinks()}
         </nav>
         <div className="header-actions">
           <label className="locale-control">
-            <Globe size={18} />
+            <Globe size={18} aria-hidden="true" />
             <span className="sr-only">Language</span>
             <select
               aria-label="Language"
@@ -143,33 +206,35 @@ export function App() {
             </select>
           </label>
           <button
-            className="icon-button studio-link"
-            aria-label={t("Course studio", "පාඨමාලා සැකසුම්", "コース設定")}
-            onClick={() => navigate("studio")}
-          >
-            <SlidersHorizontal />
-          </button>
-          <button
             className="mentor-trigger"
-            aria-label={t("Mentor", "උපදේශක", "メンター")}
             onClick={() => setMentorOpen(true)}
+            aria-label={t("Mentor", "උපදේශක", "メンター")}
           >
-            <Sparkle weight="fill" />{" "}
+            <Sparkle weight="fill" aria-hidden="true" />
             <span>{t("Mentor", "උපදේශක", "メンター")}</span>
           </button>
         </div>
       </header>
       <div className="demo-ribbon">
         <span>
-          {t("INTERACTIVE PREVIEW", "අත්හදා බැලීමේ පෙරදසුන", "体験プレビュー")}
+          {t("LEARNING PREVIEW", "ඉගෙනුම් පෙරදසුන", "学習プレビュー")}
         </span>
         {t(
-          "A little progress, every day.",
-          "සෑම දිනකම, කුඩා ප්‍රගතියක්.",
-          "毎日、少しずつ。",
+          "Try a sample lesson. No sign-up needed.",
+          "ලියාපදිංචි නොවී ආදර්ශ පාඩමක් බලන්න.",
+          "登録なしで体験レッスン。",
         )}
       </div>
-      <div tabIndex={-1} className="page-area">
+      {!canSave && (
+        <p className="storage-notice" role="status">
+          {t(
+            "Your browser cannot save changes. Progress will last only while this page stays open.",
+            "මෙම බ්‍රවුසරයේ වෙනස්කම් සුරැකිය නොහැක. පිටුව වසා දැමූ විට ප්‍රගතිය නැති වේ.",
+            "保存できません。このページを閉じると進捗が失われます。",
+          )}
+        </p>
+      )}
+      <div className="page-area">
         {view === "lesson" && (
           <Lesson
             key={courseId}
@@ -178,6 +243,7 @@ export function App() {
             completedIds={completedIds}
             onComplete={markComplete}
             onPractice={() => navigate("practice")}
+            onBack={() => navigate("courses")}
           />
         )}
         {view === "practice" && (
@@ -195,29 +261,39 @@ export function App() {
             config={safeConfig}
             completedIds={completedIds}
             lastResult={lastResult}
+            currentCourse={courseId}
             onOpen={startCourse}
             onAccess={setAccessCourse}
           />
         )}
         {view === "studio" && (
-          <Studio language={language} config={safeConfig} onSave={setConfig} />
+          <Studio
+            language={language}
+            config={safeConfig}
+            onSave={setConfig}
+            canSave={configSaved}
+          />
         )}
       </div>
+      <footer className="app-footer">
+        <span>
+          {t(
+            "Made for your next chapter.",
+            "ඔබේ අලුත් ආරම්භය වෙනුවෙන්.",
+            "新しい一歩のために。",
+          )}{" "}
+          <strong>NullVibe.</strong>
+        </span>
+        <button className="text-button" onClick={() => navigate("studio")}>
+          {t("Staff preview", "කාර්ය මණ්ඩල පෙරදසුන", "スタッフ向けプレビュー")}
+          <ArrowUpRight aria-hidden="true" />
+        </button>
+      </footer>
       <nav
         className="mobile-bottom-nav"
         aria-label={t("Mobile navigation", "ජංගම මෙනුව", "モバイルメニュー")}
       >
-        {navItems.map(([id, Icon, label]) => (
-          <button
-            key={id}
-            aria-current={view === id ? "page" : undefined}
-            className={view === id ? "active" : ""}
-            onClick={() => navigate(id)}
-          >
-            <Icon weight={view === id ? "fill" : "regular"} />
-            {label}
-          </button>
-        ))}
+        {navLinks(true)}
       </nav>
       {mentorOpen && (
         <Mentor

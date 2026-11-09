@@ -132,6 +132,16 @@
   gap: 12px;
   font-size: 12px;
   color: #526b83;
+  flex-wrap: wrap;
+}
+.nv-breadcrumb .back-link {
+  font-size: 12px;
+}
+.nv-draft-status {
+  font-size: 12px;
+  color: #526b81;
+  line-height: 1.7;
+  margin: -8px 0 24px;
 }
 .nv-breadcrumb svg {
   font-size: 17px;

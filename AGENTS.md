@@ -4,6 +4,8 @@
 
 - Use option 2 lesson workspace with a simplified white/light-blue design.
 - English is the default UI language. Sinhala and Japanese are selectable.
+- First-time visitors arrive at course discovery with a clear N5 starting action. Use plain level labels, a learner-only primary menu, and a separately labeled staff preview in the footer.
+- Keep the experience minimal, easy to understand, responsive and smooth. Preserve lesson position and in-progress practice when navigating. Motion must respect reduced-motion preferences.
 - Local prototype and architecture are the delivery scope. Production identity, payments, media and AI require credentials and approval.
 - Keep pricing, fixed access duration, live classes and media volume nullable/configurable.
 - Use feature/nullvibe-prototype. Do not change production or main branches.

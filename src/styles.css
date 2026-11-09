@@ -1,10 +1,26 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600&family=Noto+Sans+Sinhala:wght@400;500;600&display=swap");
+@font-face {
+  font-family: "DM Sans";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/fonts/dm-sans-latin.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Noto Sans Sinhala";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/fonts/noto-sans-sinhala.woff2") format("woff2");
+  unicode-range:
+    U+0964-0965, U+0D81-0DF4, U+1CF2, U+200C-200D, U+25CC, U+111E1-111F4;
+}
 
 :root {
   color: #153656;
   background: #fbfdff;
   font-family:
-    "DM Sans", "Noto Sans Sinhala", "Noto Sans JP", system-ui, sans-serif;
+    "DM Sans", "Noto Sans Sinhala", "Yu Gothic", "Hiragino Sans", Meiryo,
+    system-ui, sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 }
@@ -40,6 +56,19 @@ a:focus-visible {
 }
 h1:focus {
   outline: none;
+}
+h1,
+h2,
+[tabindex] {
+  scroll-margin-top: 96px;
+}
+html[lang="si"] .catalog-intro h1 {
+  line-height: 1.4;
+  letter-spacing: -0.025em;
+  font-size: clamp(30px, 4vw, 46px);
+}
+html[lang="ja"] .catalog-intro h1 {
+  line-height: 1.35;
 }
 button:disabled {
   cursor: default;
@@ -282,7 +311,7 @@ svg {
     background: #fff;
     border-top: 1px solid #dce8f1;
   }
-  .mobile-bottom-nav button {
+  .mobile-bottom-nav a {
     border: 0;
     background: transparent;
     display: grid;
@@ -297,7 +326,7 @@ svg {
   .mobile-bottom-nav svg {
     font-size: 21px;
   }
-  .mobile-bottom-nav button.active {
+  .mobile-bottom-nav a.active {
     color: #186da6;
   }
 }

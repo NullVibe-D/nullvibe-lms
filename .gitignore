@@ -4,3 +4,4 @@ dist/
 !.env.example
 qa/*.png
 *.log
+.vercel/

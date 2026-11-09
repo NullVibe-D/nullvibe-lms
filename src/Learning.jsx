@@ -11,6 +11,7 @@ import {
   Timer,
 } from "@phosphor-icons/react";
 import "./learning.css";
+import { sanitizeAttempt } from "./domain.mjs";
 
 const text = (language, english, sinhala, japanese) =>
   ({ en: english, si: sinhala, ja: japanese })[language] || english;
@@ -515,14 +516,32 @@ export function Lesson({
   completedIds = [],
   onComplete,
   onPractice,
+  onBack,
 }) {
   const normalizedCourse = String(courseId).toLowerCase();
   const courseLessons = lessons[normalizedCourse] || lessons.n5;
-  const [active, setActive] = useState(normalizedCourse === "n5" ? 2 : 0);
+  const positionKey = "nullvibe.lesson.v1." + normalizedCourse;
+  const [active, setActive] = useState(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(positionKey));
+      if (Number.isInteger(saved) && saved >= 0 && saved < courseLessons.length)
+        return saved;
+    } catch {
+      /* Reading still works without browser storage. */
+    }
+    const firstIncomplete = courseLessons.findIndex(
+      (_, index) => !completedIds.includes(courseId + "-" + index),
+    );
+    return firstIncomplete < 0 ? 0 : firstIncomplete;
+  });
   const titleRef = useRef(null);
   useEffect(() => {
-    setActive(normalizedCourse === "n5" ? 2 : 0);
-  }, [normalizedCourse]);
+    try {
+      localStorage.setItem(positionKey, JSON.stringify(active));
+    } catch {
+      /* Optional resume state. */
+    }
+  }, [active, positionKey]);
   const lesson = courseLessons[active];
   const lessonId = courseId + "-" + active;
   const done = completedIds.includes(lessonId);
@@ -532,6 +551,7 @@ export function Lesson({
   const percentage = Math.round((completedCount / courseLessons.length) * 100);
   function selectLesson(index) {
     setActive(index);
+    window.scrollTo({ top: 0, behavior: "instant" });
     requestAnimationFrame(() =>
       titleRef.current?.focus({ preventScroll: true }),
     );
@@ -629,7 +649,13 @@ export function Lesson({
       </aside>
       <main className="nv-lesson-main" id="main-content">
         <div className="nv-breadcrumb">
-          <BookOpen aria-hidden="true" />
+          {onBack && (
+            <button className="back-link" onClick={onBack}>
+              <CaretLeft aria-hidden="true" />
+              {text(language, "Courses", "පාඨමාලා", "コース")}
+            </button>
+          )}
+          <span aria-hidden="true">/</span>
           <span>JLPT {normalizedCourse.toUpperCase()}</span>
           <span aria-hidden="true">/</span>
           <span>
@@ -640,6 +666,12 @@ export function Lesson({
         <label className="nv-mobile-picker">
           {text(language, "Choose a lesson", "පාඩමක් තෝරන්න", "レッスンを選ぶ")}
           <select
+            aria-label={text(
+              language,
+              "Choose a lesson",
+              "පාඩමක් තෝරන්න",
+              "レッスンを選ぶ",
+            )}
             value={active}
             onChange={(event) => selectLesson(Number(event.target.value))}
           >
@@ -649,6 +681,15 @@ export function Lesson({
               </option>
             ))}
           </select>
+          <span>
+            {completedCount}/{courseLessons.length}{" "}
+            {text(
+              language,
+              "lessons complete",
+              "පාඩම් සම්පූර්ණයි",
+              "レッスン完了",
+            )}
+          </span>
         </label>
         <header className="nv-lesson-heading">
           <span className="nv-level">
@@ -917,19 +958,39 @@ export function Assessment({
   onResult,
 }) {
   const items = questions[String(courseId).toLowerCase()] || questions.n5;
-  const [answers, setAnswers] = useState([]);
-  const [selected, setSelected] = useState(null);
-  const [checked, setChecked] = useState(false);
-  const [finished, setFinished] = useState(false);
+  const draftKey = "nullvibe.practice.v1." + String(courseId).toUpperCase();
+  const [attempt, setAttempt] = useState(() => {
+    try {
+      return sanitizeAttempt(
+        JSON.parse(sessionStorage.getItem(draftKey)),
+        items.map((item) => item.options.length),
+      );
+    } catch {
+      return sanitizeAttempt(
+        null,
+        items.map((item) => item.options.length),
+      );
+    }
+  });
+  const { answers, selected, checked, finished } = attempt;
+  const [canSave, setCanSave] = useState(true);
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(draftKey, JSON.stringify(attempt));
+      setCanSave(true);
+    } catch {
+      setCanSave(false);
+    }
+  }, [attempt, draftKey]);
   const focusRef = useRef(null);
   const question = items[Math.min(answers.length, items.length - 1)];
   const score = answers.filter(
     (answer, index) => answer === items[index].correct,
   ).length;
   function advance() {
+    if (!checked || selected === null || finished) return;
     const nextAnswers = [...answers, selected];
     if (nextAnswers.length === items.length) {
-      setFinished(true);
       onResult({
         courseId,
         score: nextAnswers.filter(
@@ -938,16 +999,22 @@ export function Assessment({
         total: items.length,
       });
     }
-    setAnswers(nextAnswers);
-    setSelected(null);
-    setChecked(false);
+    setAttempt({
+      version: 1,
+      answers: nextAnswers,
+      selected: null,
+      checked: false,
+      finished: nextAnswers.length === items.length,
+    });
     requestAnimationFrame(() => focusRef.current?.focus());
   }
   function restart() {
-    setAnswers([]);
-    setSelected(null);
-    setChecked(false);
-    setFinished(false);
+    setAttempt(
+      sanitizeAttempt(
+        null,
+        items.map((item) => item.options.length),
+      ),
+    );
     requestAnimationFrame(() => focusRef.current?.focus());
   }
   return (
@@ -985,6 +1052,21 @@ export function Assessment({
           )}
         </p>
       </div>
+      <p className="nv-draft-status" role="status">
+        {canSave
+          ? text(
+              language,
+              "Your place is saved in this tab. You can come back anytime.",
+              "ඔබේ ස්ථානය මෙම ටැබයේ සුරැකේ. ඔබට නැවත පැමිණිය හැක.",
+              "このタブに保存されます。いつでも戻れます。",
+            )
+          : text(
+              language,
+              "Saving is unavailable. Finish this practice before leaving.",
+              "සුරැකීම නොහැක. පිටවීමට පෙර පුහුණුව අවසන් කරන්න.",
+              "保存できません。ページを離れる前に練習を終えてください。",
+            )}
+      </p>
       {finished ? (
         <section className="nv-results">
           <div className="nv-score">
@@ -1068,7 +1150,8 @@ export function Assessment({
           <form
             onSubmit={(event) => {
               event.preventDefault();
-              if (selected !== null) setChecked(true);
+              if (selected !== null)
+                setAttempt((previous) => ({ ...previous, checked: true }));
             }}
           >
             <fieldset disabled={checked}>
@@ -1083,7 +1166,12 @@ export function Assessment({
                     name="answer"
                     value={index}
                     checked={selected === index}
-                    onChange={() => setSelected(index)}
+                    onChange={() =>
+                      setAttempt((previous) => ({
+                        ...previous,
+                        selected: index,
+                      }))
+                    }
                   />
                   <span lang="ja">{option}</span>
                 </label>

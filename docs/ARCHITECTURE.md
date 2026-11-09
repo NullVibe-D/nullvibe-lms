@@ -1,6 +1,6 @@
 # NullVibe LMS implementation and production plan
 
-Updated 5 November 2026. The delivered application is a local interactive frontend with sample learning content. Live accounts, purchases, private video delivery and generated AI answers require the integrations below.
+Updated 7 November 2026. The delivered application is a local interactive frontend with sample learning content. Live accounts, purchases, private video delivery and generated AI answers require the integrations below.
 
 ## Implemented
 
@@ -9,6 +9,9 @@ Updated 5 November 2026. The delivered application is a local interactive fronte
 - Guided mentor examples and a free-form prompt interface with an explicit pending-provider response.
 - Null price, duration, live-class status and media volume remain undecided. Draft configuration affects the course access summary.
 - Keyboard resource tabs, native modal focus containment/Escape, visible focus, reduced motion, mobile lesson selection and mobile navigation.
+- Course-first onboarding, plain level labels, local hash routes with Back/Forward and direct links, per-course lesson position and validated session assessment drafts.
+- Explicit dialog Tab/Shift+Tab wrapping, body scroll locking and focus restoration. Saved data is validated before rendering, and unavailable browser storage produces clear feedback.
+- Local Latin/Sinhala variable fonts, system Japanese fallbacks, a 69 KB WebP lesson illustration, and short transform-only transitions with reduced-motion support.
 - Domain validation and a fail-closed entitlement policy reference. That policy is not a deployed authorization service.
 
 ## Modules

@@ -1,0 +1,10 @@
+.git
+node_modules
+dist
+qa
+docs
+tests
+AGENTS.md
+QA.md
+main
+public/assets/lesson-teacher.png

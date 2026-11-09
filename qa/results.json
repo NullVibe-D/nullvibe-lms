@@ -1,35 +1,598 @@
 {
-  "results": [
+  "date": "2026-11-07T14:32:12.047Z",
+  "baseURL": "http://127.0.0.1:4180",
+  "browser": "148.0.7778.96",
+  "scans": [
+    {
+      "width": 320,
+      "language": "en",
+      "screen": "practice-results",
+      "violations": []
+    },
+    {
+      "width": 320,
+      "language": "en",
+      "screen": "courses",
+      "violations": []
+    },
+    {
+      "width": 320,
+      "language": "en",
+      "screen": "lesson",
+      "violations": []
+    },
+    {
+      "width": 320,
+      "language": "en",
+      "screen": "practice",
+      "violations": []
+    },
+    {
+      "width": 320,
+      "language": "en",
+      "screen": "studio",
+      "violations": []
+    },
+    {
+      "width": 320,
+      "language": "en",
+      "screen": "access-dialog",
+      "violations": []
+    },
+    {
+      "width": 320,
+      "language": "en",
+      "screen": "mentor-dialog",
+      "violations": []
+    },
+    {
+      "width": 320,
+      "language": "si",
+      "screen": "courses",
+      "violations": []
+    },
+    {
+      "width": 320,
+      "language": "si",
+      "screen": "lesson",
+      "violations": []
+    },
+    {
+      "width": 320,
+      "language": "si",
+      "screen": "practice",
+      "violations": []
+    },
+    {
+      "width": 320,
+      "language": "si",
+      "screen": "studio",
+      "violations": []
+    },
+    {
+      "width": 320,
+      "language": "si",
+      "screen": "access-dialog",
+      "violations": []
+    },
+    {
+      "width": 320,
+      "language": "si",
+      "screen": "mentor-dialog",
+      "violations": []
+    },
+    {
+      "width": 320,
+      "language": "ja",
+      "screen": "courses",
+      "violations": []
+    },
+    {
+      "width": 320,
+      "language": "ja",
+      "screen": "lesson",
+      "violations": []
+    },
+    {
+      "width": 320,
+      "language": "ja",
+      "screen": "practice",
+      "violations": []
+    },
+    {
+      "width": 320,
+      "language": "ja",
+      "screen": "studio",
+      "violations": []
+    },
+    {
+      "width": 320,
+      "language": "ja",
+      "screen": "access-dialog",
+      "violations": []
+    },
+    {
+      "width": 320,
+      "language": "ja",
+      "screen": "mentor-dialog",
+      "violations": []
+    },
     {
       "width": 360,
+      "language": "en",
+      "screen": "practice-results",
+      "violations": []
+    },
+    {
+      "width": 360,
+      "language": "en",
+      "screen": "courses",
+      "violations": []
+    },
+    {
+      "width": 360,
+      "language": "en",
       "screen": "lesson",
       "violations": []
     },
     {
       "width": 360,
-      "screen": "mentor",
+      "language": "en",
+      "screen": "practice",
+      "violations": []
+    },
+    {
+      "width": 360,
+      "language": "en",
+      "screen": "studio",
+      "violations": []
+    },
+    {
+      "width": 360,
+      "language": "en",
+      "screen": "access-dialog",
+      "violations": []
+    },
+    {
+      "width": 360,
+      "language": "en",
+      "screen": "mentor-dialog",
+      "violations": []
+    },
+    {
+      "width": 360,
+      "language": "si",
+      "screen": "courses",
+      "violations": []
+    },
+    {
+      "width": 360,
+      "language": "si",
+      "screen": "lesson",
+      "violations": []
+    },
+    {
+      "width": 360,
+      "language": "si",
+      "screen": "practice",
+      "violations": []
+    },
+    {
+      "width": 360,
+      "language": "si",
+      "screen": "studio",
+      "violations": []
+    },
+    {
+      "width": 360,
+      "language": "si",
+      "screen": "access-dialog",
+      "violations": []
+    },
+    {
+      "width": 360,
+      "language": "si",
+      "screen": "mentor-dialog",
+      "violations": []
+    },
+    {
+      "width": 360,
+      "language": "ja",
+      "screen": "courses",
+      "violations": []
+    },
+    {
+      "width": 360,
+      "language": "ja",
+      "screen": "lesson",
+      "violations": []
+    },
+    {
+      "width": 360,
+      "language": "ja",
+      "screen": "practice",
+      "violations": []
+    },
+    {
+      "width": 360,
+      "language": "ja",
+      "screen": "studio",
+      "violations": []
+    },
+    {
+      "width": 360,
+      "language": "ja",
+      "screen": "access-dialog",
+      "violations": []
+    },
+    {
+      "width": 360,
+      "language": "ja",
+      "screen": "mentor-dialog",
       "violations": []
     },
     {
       "width": 768,
+      "language": "en",
+      "screen": "practice-results",
+      "violations": []
+    },
+    {
+      "width": 768,
+      "language": "en",
+      "screen": "courses",
+      "violations": []
+    },
+    {
+      "width": 768,
+      "language": "en",
       "screen": "lesson",
       "violations": []
     },
     {
       "width": 768,
-      "screen": "mentor",
+      "language": "en",
+      "screen": "practice",
+      "violations": []
+    },
+    {
+      "width": 768,
+      "language": "en",
+      "screen": "studio",
+      "violations": []
+    },
+    {
+      "width": 768,
+      "language": "en",
+      "screen": "access-dialog",
+      "violations": []
+    },
+    {
+      "width": 768,
+      "language": "en",
+      "screen": "mentor-dialog",
+      "violations": []
+    },
+    {
+      "width": 768,
+      "language": "si",
+      "screen": "courses",
+      "violations": []
+    },
+    {
+      "width": 768,
+      "language": "si",
+      "screen": "lesson",
+      "violations": []
+    },
+    {
+      "width": 768,
+      "language": "si",
+      "screen": "practice",
+      "violations": []
+    },
+    {
+      "width": 768,
+      "language": "si",
+      "screen": "studio",
+      "violations": []
+    },
+    {
+      "width": 768,
+      "language": "si",
+      "screen": "access-dialog",
+      "violations": []
+    },
+    {
+      "width": 768,
+      "language": "si",
+      "screen": "mentor-dialog",
+      "violations": []
+    },
+    {
+      "width": 768,
+      "language": "ja",
+      "screen": "courses",
+      "violations": []
+    },
+    {
+      "width": 768,
+      "language": "ja",
+      "screen": "lesson",
+      "violations": []
+    },
+    {
+      "width": 768,
+      "language": "ja",
+      "screen": "practice",
+      "violations": []
+    },
+    {
+      "width": 768,
+      "language": "ja",
+      "screen": "studio",
+      "violations": []
+    },
+    {
+      "width": 768,
+      "language": "ja",
+      "screen": "access-dialog",
+      "violations": []
+    },
+    {
+      "width": 768,
+      "language": "ja",
+      "screen": "mentor-dialog",
+      "violations": []
+    },
+    {
+      "width": 1024,
+      "language": "en",
+      "screen": "practice-results",
+      "violations": []
+    },
+    {
+      "width": 1024,
+      "language": "en",
+      "screen": "courses",
+      "violations": []
+    },
+    {
+      "width": 1024,
+      "language": "en",
+      "screen": "lesson",
+      "violations": []
+    },
+    {
+      "width": 1024,
+      "language": "en",
+      "screen": "practice",
+      "violations": []
+    },
+    {
+      "width": 1024,
+      "language": "en",
+      "screen": "studio",
+      "violations": []
+    },
+    {
+      "width": 1024,
+      "language": "en",
+      "screen": "access-dialog",
+      "violations": []
+    },
+    {
+      "width": 1024,
+      "language": "en",
+      "screen": "mentor-dialog",
+      "violations": []
+    },
+    {
+      "width": 1024,
+      "language": "si",
+      "screen": "courses",
+      "violations": []
+    },
+    {
+      "width": 1024,
+      "language": "si",
+      "screen": "lesson",
+      "violations": []
+    },
+    {
+      "width": 1024,
+      "language": "si",
+      "screen": "practice",
+      "violations": []
+    },
+    {
+      "width": 1024,
+      "language": "si",
+      "screen": "studio",
+      "violations": []
+    },
+    {
+      "width": 1024,
+      "language": "si",
+      "screen": "access-dialog",
+      "violations": []
+    },
+    {
+      "width": 1024,
+      "language": "si",
+      "screen": "mentor-dialog",
+      "violations": []
+    },
+    {
+      "width": 1024,
+      "language": "ja",
+      "screen": "courses",
+      "violations": []
+    },
+    {
+      "width": 1024,
+      "language": "ja",
+      "screen": "lesson",
+      "violations": []
+    },
+    {
+      "width": 1024,
+      "language": "ja",
+      "screen": "practice",
+      "violations": []
+    },
+    {
+      "width": 1024,
+      "language": "ja",
+      "screen": "studio",
+      "violations": []
+    },
+    {
+      "width": 1024,
+      "language": "ja",
+      "screen": "access-dialog",
+      "violations": []
+    },
+    {
+      "width": 1024,
+      "language": "ja",
+      "screen": "mentor-dialog",
       "violations": []
     },
     {
       "width": 1440,
+      "language": "en",
+      "screen": "practice-results",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "language": "en",
+      "screen": "courses",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "language": "en",
       "screen": "lesson",
       "violations": []
     },
     {
       "width": 1440,
-      "screen": "mentor",
+      "language": "en",
+      "screen": "practice",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "language": "en",
+      "screen": "studio",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "language": "en",
+      "screen": "access-dialog",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "language": "en",
+      "screen": "mentor-dialog",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "language": "si",
+      "screen": "courses",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "language": "si",
+      "screen": "lesson",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "language": "si",
+      "screen": "practice",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "language": "si",
+      "screen": "studio",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "language": "si",
+      "screen": "access-dialog",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "language": "si",
+      "screen": "mentor-dialog",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "language": "ja",
+      "screen": "courses",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "language": "ja",
+      "screen": "lesson",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "language": "ja",
+      "screen": "practice",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "language": "ja",
+      "screen": "studio",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "language": "ja",
+      "screen": "access-dialog",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "language": "ja",
+      "screen": "mentor-dialog",
+      "violations": []
+    },
+    {
+      "width": 360,
+      "language": "en",
+      "screen": "all-wrong-results",
       "violations": []
     }
+  ],
+  "checks": [
+    "320px: first visit, keyboard, history, lesson resume, assessment resume/scoring, search, dialogs, N4 mentor, safe text, settings validation/persistence",
+    "320px: six screens, all three languages, accessibility and overflow",
+    "360px: first visit, keyboard, history, lesson resume, assessment resume/scoring, search, dialogs, N4 mentor, safe text, settings validation/persistence",
+    "360px: six screens, all three languages, accessibility and overflow",
+    "768px: first visit, keyboard, history, lesson resume, assessment resume/scoring, search, dialogs, N4 mentor, safe text, settings validation/persistence",
+    "768px: six screens, all three languages, accessibility and overflow",
+    "1024px: first visit, keyboard, history, lesson resume, assessment resume/scoring, search, dialogs, N4 mentor, safe text, settings validation/persistence",
+    "1024px: six screens, all three languages, accessibility and overflow",
+    "1440px: first visit, keyboard, history, lesson resume, assessment resume/scoring, search, dialogs, N4 mentor, safe text, settings validation/persistence",
+    "1440px: six screens, all three languages, accessibility and overflow",
+    "Malformed storage, unknown routes, reduced motion, all-wrong answer review, complete N4 assessment",
+    "Storage disabled: usable learning and truthful save feedback"
   ],
   "errors": []
 }

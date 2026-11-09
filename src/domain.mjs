@@ -54,6 +54,64 @@ export function sanitizeProgress(value) {
   ];
 }
 
+export function sanitizeResult(value) {
+  if (
+    !value ||
+    !["N5", "N4"].includes(value.courseId) ||
+    value.total !== 5 ||
+    !Number.isInteger(value.score) ||
+    value.score < 0 ||
+    value.score > value.total
+  )
+    return null;
+  return { courseId: value.courseId, score: value.score, total: value.total };
+}
+
+export function sanitizeAttempt(value, optionCounts) {
+  const empty = {
+    version: 1,
+    answers: [],
+    selected: null,
+    checked: false,
+    finished: false,
+  };
+  if (
+    !value ||
+    value.version !== 1 ||
+    !Array.isArray(value.answers) ||
+    value.answers.length > optionCounts.length ||
+    value.answers.some(
+      (answer, index) =>
+        !Number.isInteger(answer) ||
+        answer < 0 ||
+        answer >= optionCounts[index],
+    ) ||
+    typeof value.checked !== "boolean" ||
+    typeof value.finished !== "boolean"
+  )
+    return empty;
+  const complete = value.answers.length === optionCounts.length;
+  const validSelection =
+    value.selected === null ||
+    (!complete &&
+      Number.isInteger(value.selected) &&
+      value.selected >= 0 &&
+      value.selected < optionCounts[value.answers.length]);
+  if (
+    !validSelection ||
+    value.finished !== complete ||
+    (value.checked && (value.selected === null || complete))
+  )
+    return empty;
+  return {
+    version: 1,
+    answers: [...value.answers],
+    selected: value.selected,
+    checked: value.checked,
+    finished: value.finished,
+  };
+}
+
 // Server-side policy reference. The browser demo does not enforce paid access.
 export function hasEntitlement(entitlement, courseId, now = Date.now()) {
   if (

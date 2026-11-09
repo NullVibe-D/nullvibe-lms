@@ -3,7 +3,6 @@ import {
   ArrowRight,
   BookOpen,
   CheckCircle,
-  Clock,
   LockKey,
   MagnifyingGlass,
   PaperPlaneTilt,
@@ -17,15 +16,24 @@ function translator(language) {
     ({ en: english, si: sinhala, ja: japanese })[language] || english;
 }
 
-function Dialog({ title, onClose, children, wide = false }) {
+function Dialog({
+  title,
+  onClose,
+  children,
+  wide = false,
+  closeLabel = "Close",
+}) {
   const ref = useRef(null);
   useEffect(() => {
     const element = ref.current;
     const previous = document.activeElement;
+    const overflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     element.showModal();
     return () => {
       element.close();
-      previous?.focus();
+      document.body.style.overflow = overflow;
+      if (previous?.isConnected) previous.focus({ preventScroll: true });
     };
   }, []);
   return (
@@ -34,13 +42,42 @@ function Dialog({ title, onClose, children, wide = false }) {
       aria-label={title}
       className={wide ? "workspace-dialog mentor-dialog" : "workspace-dialog"}
       onCancel={onClose}
+      onKeyDown={(event) => {
+        if (event.key !== "Tab") return;
+        const controls = Array.from(
+          ref.current.querySelectorAll(
+            'button:not(:disabled), input:not(:disabled), select:not(:disabled), textarea:not(:disabled), a[href], [tabindex]:not([tabindex="-1"])',
+          ),
+        ).filter((element) => element.getClientRects().length);
+        const first = controls[0];
+        const last = controls[controls.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last?.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first?.focus();
+        }
+      }}
       onClick={(event) => {
-        if (event.target === ref.current) onClose();
+        if (event.target !== ref.current) return;
+        const bounds = ref.current.getBoundingClientRect();
+        if (
+          event.clientX < bounds.left ||
+          event.clientX > bounds.right ||
+          event.clientY < bounds.top ||
+          event.clientY > bounds.bottom
+        )
+          onClose();
       }}
     >
       <header>
         <h2>{title}</h2>
-        <button className="icon-button" onClick={onClose} aria-label="Close">
+        <button
+          className="icon-button"
+          onClick={onClose}
+          aria-label={closeLabel}
+        >
           <X />
         </button>
       </header>
@@ -51,201 +88,331 @@ function Dialog({ title, onClose, children, wide = false }) {
 
 export function Catalog({
   language,
-  config,
   completedIds,
   lastResult,
+  currentCourse,
   onOpen,
   onAccess,
 }) {
   const t = translator(language);
   const [filter, setFilter] = useState("all");
   const [query, setQuery] = useState("");
+  const countFor = (id) =>
+    completedIds.filter((value) => value.startsWith(id + "-")).length;
+  const resumeCourse = countFor(currentCourse)
+    ? currentCourse
+    : countFor("N5")
+      ? "N5"
+      : countFor("N4")
+        ? "N4"
+        : null;
+  const actionLabel = (id) =>
+    countFor(id) === 5
+      ? t("Review ", "නැවත බලන්න ", "復習する ") + id
+      : countFor(id)
+        ? t("Continue ", "ඉදිරියට යන්න ", "続ける ") + id
+        : t("Start ", "අරඹන්න ", "始める ") + id;
   const courses = [
     {
       id: "N5",
-      title: t(
-        "Your first words. Your next chapter.",
-        "ඔබේ පළමු වචන. අලුත් ආරම්භයක්.",
-        "最初の言葉、新しい一歩。",
-      ),
+      title: t("Japanese foundations", "ජපන් භාෂාවේ පදනම", "日本語の基礎"),
       subtitle: t(
-        "Build a confident foundation in Japanese, with Sinhala explanations.",
-        "සිංහල පැහැදිලි කිරීම් සමඟ ජපන් භාෂාවට ශක්තිමත් පදනමක්.",
-        "シンハラ語の解説で日本語の基礎を学ぶ。",
+        "New to Japanese? Start with letters, greetings and your first sentences.",
+        "ජපන් භාෂාවට අලුත්ද? අකුරු, ආචාර සහ සරල වාක්‍යවලින් අරඹන්න.",
+        "初めての方へ。文字、あいさつ、簡単な文から始めましょう。",
       ),
-      tag: t("Start here", "මෙතැනින් අරඹන්න", "ここから始める"),
+      tag: t("Beginner", "ආරම්භක", "入門"),
+      keywords: "beginner basics hiragana letters foundation",
     },
     {
       id: "N4",
-      title: t(
-        "Turn knowledge into conversation.",
-        "දැනුම සංවාදයක් බවට පත් කරන්න.",
-        "知識を会話につなげる。",
-      ),
+      title: t("Everyday Japanese", "එදිනෙදා ජපන් භාෂාව", "日常の日本語"),
       subtitle: t(
-        "Connect ideas, explore everyday expressions, and take the next step.",
-        "එදිනෙදා ප්‍රකාශන ඉගෙන ගෙන ඊළඟ පියවර තබන්න.",
-        "日常表現を学んで、次のステップへ。",
+        "Know the N5 basics? Build longer sentences and everyday conversation skills.",
+        "N5 මූලික දැනුම තිබේද? දිගු වාක්‍ය සහ එදිනෙදා සංවාද ඉගෙන ගන්න.",
+        "N5の基礎がある方へ。長い文や日常会話を練習しましょう。",
       ),
-      tag: t("Build on N5", "N5 දැනුම වැඩි කරන්න", "N5の次へ"),
+      tag: t("After N5", "N5 පසු", "N5の次へ"),
+      keywords: "intermediate conversation grammar everyday",
     },
   ];
   const visible = courses.filter(
     (course) =>
       (filter === "all" || filter === course.id) &&
-      (course.id + " " + course.title)
+      (
+        course.id +
+        " " +
+        course.title +
+        " " +
+        course.subtitle +
+        " " +
+        course.tag +
+        " " +
+        course.keywords
+      )
         .toLowerCase()
         .includes(query.toLowerCase().trim()),
   );
   return (
     <main id="main-content" className="catalog-page">
-      <div className="catalog-intro">
-        <span className="eyebrow">LEARN JAPANESE, WITH NULLVIBE</span>
-        <h1 tabIndex={-1}>
-          {t("A new language.", "අලුත් භාෂාවක්.", "新しい言葉。")}
-          <br />
-          <em>
+      <section className="catalog-hero" aria-labelledby="welcome-heading">
+        <div className="catalog-intro">
+          <span className="eyebrow">
             {t(
-              "A world of possibility.",
-              "හැකියාවන් පිරුණු ලොවක්.",
-              "広がる可能性。",
+              "YOUR PATH TO JAPANESE",
+              "ජපන් භාෂාවට ඔබේ මඟ",
+              "日本語への第一歩",
             )}
-          </em>
-        </h1>
-        <p>
-          {t(
-            "Thoughtfully paced lessons. Clear explanations. A little closer to Japan, every day.",
-            "පියවරෙන් පියවර පාඩම්. පැහැදිලි විස්තර. සෑම දිනකම ජපානයට තවත් සමීපව.",
-            "自分のペースで、分かりやすく。毎日、日本に少し近づく。",
-          )}
-        </p>
-      </div>
-      <div className="catalog-toolbar">
-        <div
-          className="filter-group"
-          aria-label={t("Course level", "පාඨමාලා මට්ටම", "レベル")}
-        >
-          {["all", "N5", "N4"].map((value) => (
+          </span>
+          <h1 id="welcome-heading" tabIndex={-1}>
+            {t("Japanese,", "ජපන් භාෂාව,", "日本語を、")}
+            <br />
+            <em>{t("made simple.", "සරලව ඉගෙන ගන්න.", "わかりやすく。")}</em>
+          </h1>
+          <p>
+            {t(
+              "From your first word to your next milestone. Learn at your pace, with clear Sinhala explanations.",
+              "ඔබේ පළමු වචනයේ සිට ඊළඟ ඉලක්කය දක්වා. පැහැදිලි සිංහල විස්තර සමඟ ඔබේ වේගයෙන් ඉගෙන ගන්න.",
+              "最初の一言から次の目標へ。シンハラ語の解説で、自分のペースで学びましょう。",
+            )}
+          </p>
+          <div className="hero-actions">
             <button
-              key={value}
-              aria-pressed={filter === value}
-              className={filter === value ? "selected" : ""}
-              onClick={() => setFilter(value)}
+              className="primary-button"
+              onClick={() => onOpen(resumeCourse || "N5")}
             >
-              {value === "all"
-                ? t("All courses", "සියලු පාඨමාලා", "すべて")
-                : "JLPT " + value}
+              {actionLabel(resumeCourse || "N5")}
+              <ArrowRight aria-hidden="true" />
             </button>
-          ))}
+            <button
+              className="text-button"
+              onClick={() => document.getElementById("level-heading")?.focus()}
+            >
+              {t("Find my level", "මගේ මට්ටම තෝරන්න", "レベルを選ぶ")}
+              <ArrowRight aria-hidden="true" />
+            </button>
+          </div>
+          <small className="hero-reassurance">
+            {resumeCourse
+              ? t(
+                  "Your progress stays on this browser.",
+                  "ප්‍රගතිය මෙම බ්‍රවුසරයේ සුරැකේ.",
+                  "進捗はこのブラウザに保存されます。",
+                )
+              : t(
+                  "New to Japanese? N5 is your starting point.",
+                  "ජපන් භාෂාවට අලුත්ද? N5 වලින් අරඹන්න.",
+                  "初めてなら、N5から。",
+                )}
+          </small>
         </div>
-        <label className="search-field">
-          <MagnifyingGlass />
-          <input
-            aria-label={t("Search courses", "පාඨමාලා සොයන්න", "コースを検索")}
-            placeholder={t(
-              "Find your course",
-              "පාඨමාලාව සොයන්න",
-              "コースを探す",
+        <div className="kana-art" aria-hidden="true">
+          <div className="kana-orbit"></div>
+          <div className="kana-card">
+            <span>01 / HIRAGANA</span>
+            <strong lang="ja">あ</strong>
+            <p>
+              a <span>·</span>{" "}
+              {t("a new beginning", "නව ආරම්භයක්", "新しい始まり")}
+            </p>
+            <div>
+              <span>あ</span>
+              <span>い</span>
+              <span>う</span>
+              <span>え</span>
+              <span>お</span>
+            </div>
+          </div>
+          <span className="kana-caption">
+            {t(
+              "Small steps. New possibilities.",
+              "කුඩා පියවර. නව හැකියාවන්.",
+              "小さな一歩、新しい可能性。",
             )}
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-          />
-        </label>
-      </div>
-      <div className="course-grid">
-        {visible.map((course) => {
-          const count = completedIds.filter((id) =>
-            id.startsWith(course.id + "-"),
-          ).length;
-          const settings = config[course.id];
-          return (
+          </span>
+        </div>
+      </section>
+      <ol
+        className="learning-steps"
+        aria-label={t("How it works", "ඉගෙන ගන්නා ආකාරය", "学習の流れ")}
+      >
+        {[
+          t("Learn one idea", "එක් කරුණක් ඉගෙන ගන්න", "一つずつ学ぶ"),
+          t("Try a short practice", "කෙටි පුහුණුවක් කරන්න", "短い練習に挑戦"),
+          t("Build your confidence", "විශ්වාසය වැඩි කරගන්න", "自信をつける"),
+        ].map((label, i) => (
+          <li key={label}>
+            <span>{"0" + (i + 1)}</span>
+            {label}
+          </li>
+        ))}
+      </ol>
+      <section className="course-section" aria-labelledby="level-heading">
+        <div className="section-heading">
+          <div>
+            <span className="eyebrow">JLPT N5 / N4</span>
+            <h2 id="level-heading" tabIndex={-1}>
+              {t(
+                "Choose your starting point.",
+                "ඔබේ ආරම්භය තෝරන්න.",
+                "自分に合うコースを。",
+              )}
+            </h2>
+          </div>
+          <span className="sample-label">
+            {t(
+              "Sample lessons available",
+              "ආදර්ශ පාඩම් තිබේ",
+              "体験レッスン公開中",
+            )}
+          </span>
+        </div>
+        <div className="catalog-toolbar">
+          <div
+            className="filter-group"
+            role="group"
+            aria-label={t("Course level", "පාඨමාලා මට්ටම", "レベル")}
+          >
+            {["all", "N5", "N4"].map((value) => (
+              <button
+                key={value}
+                aria-pressed={filter === value}
+                className={filter === value ? "selected" : ""}
+                onClick={() => setFilter(value)}
+              >
+                {value === "all"
+                  ? t("All courses", "සියලු පාඨමාලා", "すべて")
+                  : "JLPT " + value}
+              </button>
+            ))}
+          </div>
+          <label className="search-field">
+            <MagnifyingGlass aria-hidden="true" />
+            <input
+              type="search"
+              aria-label={t("Search courses", "පාඨමාලා සොයන්න", "コースを検索")}
+              placeholder={t(
+                "Search courses",
+                "පාඨමාලා සොයන්න",
+                "コースを検索",
+              )}
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+            />
+          </label>
+        </div>
+        <p className="sr-only" role="status">
+          {visible.length}{" "}
+          {t("courses found", "පාඨමාලා හමු විය", "コースが見つかりました")}
+        </p>
+        <div className="course-grid">
+          {visible.map((course) => (
             <article className="course-card" key={course.id}>
-              <div className="course-art">
+              <div className={"course-art level-" + course.id.toLowerCase()}>
                 <span>JLPT</span>
                 <strong>{course.id}</strong>
-                <BookOpen weight="duotone" />
+                <BookOpen weight="duotone" aria-hidden="true" />
                 <small>{course.tag}</small>
               </div>
               <div className="course-body">
-                <span className="eyebrow">
-                  {t(
-                    "JAPANESE • SINHALA EXPLANATIONS",
-                    "ජපන් • සිංහල පැහැදිලි කිරීම්",
-                    "日本語 • シンハラ語解説",
-                  )}
-                </span>
-                <h2>{course.title}</h2>
+                <h3>{course.title}</h3>
                 <p>{course.subtitle}</p>
                 <div className="course-meta">
                   <span>
-                    <BookOpen />
+                    <BookOpen aria-hidden="true" />
                     {t("5 sample lessons", "ආදර්ශ පාඩම් 5", "体験レッスン5つ")}
                   </span>
                   <span>
-                    <Clock />
-                    {settings.accessDays
-                      ? settings.accessDays +
-                        t(" days access", " දින ප්‍රවේශය", "日間")
-                      : t(
-                          "Access period to be confirmed",
-                          "කාලය තහවුරු කිරීමට ඇත",
-                          "受講期間は未定",
-                        )}
+                    <CheckCircle aria-hidden="true" />
+                    {t(
+                      "Practice & answer review",
+                      "පුහුණුව හා පිළිතුරු විමසුම",
+                      "練習と解説",
+                    )}
                   </span>
                 </div>
-                <div className="course-progress-row">
-                  <progress
-                    value={count}
-                    max={5}
-                    aria-label={t(
-                      "Sample lesson progress",
-                      "ආදර්ශ පාඩම් ප්‍රගතිය",
-                      "進捗",
-                    )}
-                  />
-                  <span>{count}/5</span>
-                </div>
+                {countFor(course.id) > 0 && (
+                  <div className="course-progress-row">
+                    <progress
+                      value={countFor(course.id)}
+                      max={5}
+                      aria-label={
+                        course.id +
+                        " " +
+                        t(
+                          "sample lesson progress",
+                          "ආදර්ශ පාඩම් ප්‍රගතිය",
+                          "進捗",
+                        )
+                      }
+                    />
+                    <span>
+                      {countFor(course.id)}/5{" "}
+                      {t("complete", "සම්පූර්ණයි", "完了")}
+                    </span>
+                  </div>
+                )}
                 <div className="course-buttons">
                   <button
                     className="primary-button"
                     onClick={() => onOpen(course.id)}
                   >
-                    {t("Explore lessons", "පාඩම් බලන්න", "レッスンを見る")}
-                    <ArrowRight />
+                    {actionLabel(course.id)}
+                    <ArrowRight aria-hidden="true" />
                   </button>
                   <button
                     className="text-button"
                     onClick={() => onAccess(course.id)}
+                    aria-label={
+                      course.id +
+                      " " +
+                      t("course details", "පාඨමාලා විස්තර", "コースの詳細")
+                    }
                   >
-                    {t("Course access", "පාඨමාලා ප්‍රවේශය", "受講について")}
+                    {t("Course details", "පාඨමාලා විස්තර", "コースの詳細")}
                   </button>
                 </div>
               </div>
             </article>
-          );
-        })}
-      </div>
-      {visible.length === 0 && (
-        <p className="empty-state" role="status">
-          {t(
-            "No courses match. Try N5 or N4.",
-            "ගැළපෙන පාඨමාලා නැත. N5 හෝ N4 සොයන්න.",
-            "該当するコースがありません。N5、N4をお試しください。",
-          )}
-        </p>
-      )}
+          ))}
+        </div>
+        {visible.length === 0 && (
+          <div className="empty-state">
+            <p>
+              {t(
+                "No courses found. Try N5, N4 or beginner.",
+                "පාඨමාලා හමු නොවීය. N5 හෝ N4 සොයන්න.",
+                "該当するコースがありません。N5、N4をお試しください。",
+              )}
+            </p>
+            <button
+              className="quiet-button"
+              onClick={() => {
+                setQuery("");
+                setFilter("all");
+              }}
+            >
+              {t(
+                "Show all courses",
+                "සියලු පාඨමාලා පෙන්වන්න",
+                "すべてのコースを表示",
+              )}
+            </button>
+          </div>
+        )}
+      </section>
       {lastResult && (
         <p className="last-result">
-          <CheckCircle />
+          <CheckCircle aria-hidden="true" />
           {t("Last practice", "අවසන් පුහුණුව", "前回の練習")} ·{" "}
           {lastResult.courseId} · {lastResult.score}/{lastResult.total}
         </p>
       )}
       <p className="catalog-footnote">
         {t(
-          "Course content is a demonstration. The teaching team will confirm the complete syllabus and enrolment details.",
-          "මෙය ආදර්ශ අන්තර්ගතයකි. සම්පූර්ණ විෂය නිර්දේශය හා ලියාපදිංචි විස්තර ගුරු කණ්ඩායම තහවුරු කරනු ඇත.",
-          "体験用コンテンツです。正式な教材と受講情報は講師が確認します。",
+          "You’re exploring sample content. Full course enrolment, pricing and lesson videos will be confirmed by the teaching team.",
+          "ඔබ බලන්නේ ආදර්ශ අන්තර්ගතයකි. ලියාපදිංචිය, ගාස්තු හා පාඩම් වීඩියෝ ගුරු කණ්ඩායම තහවුරු කරනු ඇත.",
+          "体験用コンテンツです。正式な受講案内、料金、動画は講師が確認します。",
         )}
       </p>
     </main>
@@ -261,16 +428,14 @@ export function AccessDialog({
 }) {
   const t = translator(language);
   return (
-    <Dialog title={"JLPT " + courseId} onClose={onClose}>
+    <Dialog
+      title={"JLPT " + courseId}
+      onClose={onClose}
+      closeLabel={t("Close", "වසන්න", "閉じる")}
+    >
       <div className="dialog-body">
         <LockKey size={32} weight="duotone" />
-        <h3>
-          {t(
-            "Your learning, at your pace.",
-            "ඔබේ වේගයෙන් ඉගෙන ගන්න.",
-            "自分のペースで学ぼう。",
-          )}
-        </h3>
+        <h3>{t("Course details", "පාඨමාලා විස්තර", "コースの詳細")}</h3>
         <dl className="access-details">
           <div>
             <dt>{t("Course fee", "පාඨමාලා ගාස්තුව", "受講料")}</dt>
@@ -293,6 +458,28 @@ export function AccessDialog({
             </dd>
           </div>
         </dl>
+        <dl className="access-details">
+          <div>
+            <dt>{t("Live classes", "සජීවී පන්ති", "ライブ授業")}</dt>
+            <dd>
+              {config.liveClasses === null
+                ? t("To be confirmed", "තහවුරු කිරීමට ඇත", "未定")
+                : config.liveClasses
+                  ? t("Planned", "සැලසුම් කර ඇත", "予定あり")
+                  : t("Self-paced only", "ස්වයං අධ්‍යයනය පමණි", "自習のみ")}
+            </dd>
+          </div>
+          <div>
+            <dt>
+              {t("Planned video content", "සැලසුම් කළ වීඩියෝ", "動画の予定")}
+            </dt>
+            <dd>
+              {config.mediaHours === null
+                ? t("To be confirmed", "තහවුරු කිරීමට ඇත", "未定")
+                : config.mediaHours + t(" hours", " පැය", "時間")}
+            </dd>
+          </div>
+        </dl>
         <p>
           {t(
             "Enrolment opens after pricing and payment options are confirmed. You can explore the sample lessons now.",
@@ -309,12 +496,14 @@ export function AccessDialog({
   );
 }
 
-export function Studio({ language, config, onSave }) {
+export function Studio({ language, config, onSave, canSave = true }) {
   const t = translator(language);
   const [courseId, setCourseId] = useState("N5");
   const [draft, setDraft] = useState(config);
   const [message, setMessage] = useState("");
+  const [saveError, setSaveError] = useState(false);
   function change(field, value) {
+    setSaveError(false);
     setDraft((previous) => ({
       ...previous,
       [courseId]: { ...previous[courseId], [field]: value },
@@ -326,6 +515,7 @@ export function Studio({ language, config, onSave }) {
     if (
       Object.values(draft).some((value) => validateCourseConfig(value).length)
     ) {
+      setSaveError(true);
       setMessage(
         t(
           "Check the values and try again.",
@@ -336,12 +526,9 @@ export function Studio({ language, config, onSave }) {
       return;
     }
     onSave(draft);
+    setSaveError(false);
     setMessage(
-      t(
-        "Draft saved on this device.",
-        "කෙටුම්පත මෙම උපාංගයේ සුරැකිණි.",
-        "この端末に保存しました。",
-      ),
+      t("Draft updated.", "කෙටුම්පත යාවත්කාලීන විය.", "下書きを更新しました。"),
     );
   }
   return (
@@ -370,6 +557,7 @@ export function Studio({ language, config, onSave }) {
         <label>
           {t("Course", "පාඨමාලාව", "コース")}
           <select
+            aria-label={t("Course", "පාඨමාලාව", "コース")}
             value={courseId}
             onChange={(event) => {
               setCourseId(event.target.value);
@@ -420,6 +608,7 @@ export function Studio({ language, config, onSave }) {
         <label>
           {t("Live classes", "සජීවී පන්ති", "ライブ授業")}
           <select
+            aria-label={t("Live classes", "සජීවී පන්ති", "ライブ授業")}
             value={
               draft[courseId].liveClasses === null
                 ? "undecided"
@@ -464,7 +653,22 @@ export function Studio({ language, config, onSave }) {
           <CheckCircle />
         </button>
         <p role="status" className="save-message">
-          {message}
+          {message &&
+            (saveError
+              ? message
+              : canSave
+                ? message +
+                  " " +
+                  t(
+                    "Saved on this browser.",
+                    "මෙම බ්‍රවුසරයේ සුරැකිණි.",
+                    "このブラウザに保存しました。",
+                  )
+                : t(
+                    "Updated for this visit. Your browser could not save the draft.",
+                    "මෙම වාරයට යාවත්කාලීන විය. කෙටුම්පත සුරැකිය නොහැක.",
+                    "今回は更新しましたが、ブラウザに保存できません。",
+                  ))}
         </p>
       </form>
     </main>
@@ -479,33 +683,65 @@ export function Mentor({ language, courseId, onClose }) {
   useEffect(() => {
     bottom.current?.scrollIntoView({ block: "nearest" });
   }, [messages]);
-  const prompts = [
-    [
-      t("Explain は and です", "は සහ です පැහැදිලි කරන්න", "はとですを説明"),
-      t(
-        "は marks the topic. In わたしは がくせいです, わたし is the topic and がくせいです means ‘am a student’. は is pronounced ‘wa’ here.",
-        "は මාතෘකාව දක්වයි. わたしは がくせいです යනු ‘මම ශිෂ්‍යයෙක්’ යන්නයි. මෙහි は ‘wa’ ලෙස කියවෙයි.",
-        "はは話題を示します。「わたしは がくせいです」は自分が学生であることを表します。助詞のはは「わ」と読みます。",
-      ),
-    ],
-    [
-      t(
-        "Give me a practice sentence",
-        "පුහුණු වාක්‍යයක් දෙන්න",
-        "練習の文を教えて",
-      ),
-      t(
-        "Try introducing yourself. わたしは ___ です。 Fill the blank with your name. For example, わたしは アマヤ です。",
-        "ඔබව හඳුන්වා දෙන්න. わたしは ___ です。 හිස්තැනට ඔබේ නම යොදන්න. උදාහරණයක් ලෙස わたしは アマヤ です。",
-        "自己紹介しましょう。「わたしは ___ です。」に名前を入れてください。例「わたしは アマヤ です。」",
-      ),
-    ],
-  ];
+  const prompts =
+    courseId === "N4"
+      ? [
+          [
+            t(
+              "Explain たことがある",
+              "たことがある පැහැදිලි කරන්න",
+              "たことがあるを説明",
+            ),
+            t(
+              "Use a past plain-form verb + ことがある for an experience. 日本に行ったことがあります means “I have been to Japan.” It tells us about experience, rather than when it happened.",
+              "අත්දැකීමක් ගැන කියන්න ක්‍රියාපදයේ අතීත සරල රූපයට ことがある යොදන්න. 日本に行ったことがあります යනු “මම ජපානයට ගොස් තිබෙනවා” යන්නයි.",
+              "動詞のた形＋ことがあるで経験を表します。「日本に行ったことがあります」は日本へ行く経験があるという意味です。",
+            ),
+          ],
+          [
+            t(
+              "Practise giving a reason",
+              "හේතුවක් කීමට පුහුණු වන්න",
+              "理由を言う練習",
+            ),
+            t(
+              "Join a reason and a result with ので. 雨が降っているので、家にいます。 means “Because it is raining, I am staying home.” Try changing the reason.",
+              "හේතුව හා ප්‍රතිඵලය ので යොදා සම්බන්ධ කරන්න. 雨が降っているので、家にいます。 යනු “වැස්ස නිසා මම ගෙදර සිටිනවා” යන්නයි. හේතුව වෙනස් කර බලන්න.",
+              "のでで理由と結果をつなぎます。「雨が降っているので、家にいます。」理由を変えて練習しましょう。",
+            ),
+          ],
+        ]
+      : [
+          [
+            t(
+              "Explain は and です",
+              "は සහ です පැහැදිලි කරන්න",
+              "はとですを説明",
+            ),
+            t(
+              "は marks the topic. In わたしは がくせいです, わたし is the topic and がくせいです means ‘am a student’. は is pronounced ‘wa’ here.",
+              "は මාතෘකාව දක්වයි. わたしは がくせいです යනු ‘මම ශිෂ්‍යයෙක්’ යන්නයි. මෙහි は ‘wa’ ලෙස කියවෙයි.",
+              "はは話題を示します。「わたしは がくせいです」は自分が学生であることを表します。助詞のはは「わ」と読みます。",
+            ),
+          ],
+          [
+            t(
+              "Give me a practice sentence",
+              "පුහුණු වාක්‍යයක් දෙන්න",
+              "練習の文を教えて",
+            ),
+            t(
+              "Try introducing yourself. わたしは ___ です。 Fill the blank with your name. For example, わたしは アマヤ です。",
+              "ඔබව හඳුන්වා දෙන්න. わたしは ___ です。 හිස්තැනට ඔබේ නම යොදන්න. උදාහරණයක් ලෙස わたしは アマヤ です。",
+              "自己紹介しましょう。「わたしは ___ です。」に名前を入れてください。例「わたしは アマヤ です。」",
+            ),
+          ],
+        ];
   function send(event) {
     event.preventDefault();
     if (!draft.trim()) return;
     setMessages((previous) => [
-      ...previous,
+      ...previous.slice(-38),
       { role: "learner", text: draft.trim() },
       {
         role: "mentor",
@@ -522,6 +758,7 @@ export function Mentor({ language, courseId, onClose }) {
     <Dialog
       title={t("Your study companion", "ඔබේ අධ්‍යයන සහකරු", "学習パートナー")}
       onClose={onClose}
+      closeLabel={t("Close", "වසන්න", "閉じる")}
       wide
     >
       <div className="mentor-intro">
@@ -548,7 +785,7 @@ export function Mentor({ language, courseId, onClose }) {
             key={question}
             onClick={() =>
               setMessages((previous) => [
-                ...previous,
+                ...previous.slice(-38),
                 { role: "learner", text: question },
                 { role: "mentor", text: answer },
               ])
@@ -561,9 +798,20 @@ export function Mentor({ language, courseId, onClose }) {
       </div>
       <div
         className="message-list"
+        role="log"
+        aria-label={t("Study conversation", "අධ්‍යයන සංවාදය", "学習の会話")}
         aria-live="polite"
         aria-relevant="additions"
       >
+        {messages.length === 0 && (
+          <p className="mentor-empty">
+            {t(
+              "Choose an example above to get started. These are prepared explanations; live AI replies are not connected yet.",
+              "ඉහත ආදර්ශයක් තෝරා අරඹන්න. මේවා සකස් කළ පැහැදිලි කිරීම්ය. සජීවී AI පිළිතුරු තවම සම්බන්ධ කර නැත.",
+              "上の例を選んで始めましょう。用意された解説です。AIによる回答はまだ利用できません。",
+            )}
+          </p>
+        )}
         {messages.map((message, index) => (
           <p className={message.role} key={index}>
             {message.text}
@@ -581,9 +829,9 @@ export function Mentor({ language, courseId, onClose }) {
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
           placeholder={t(
-            "Ask about your lesson…",
-            "පාඩම ගැන අසන්න…",
-            "レッスンについて質問…",
+            "Preview a question…",
+            "ආදර්ශ ප්‍රශ්නයක් ලියන්න…",
+            "質問を試す…",
           )}
         />
         <button

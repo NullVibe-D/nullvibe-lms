@@ -1,0 +1,285 @@
+{
+  "date": "2026-11-07T14:30:15.080Z",
+  "kind": "Local compiled build; not field performance or physical-device testing",
+  "assets": [
+    {
+      "file": "index-DkJrgtjj.css",
+      "bytes": 24810,
+      "gzipBytes": 6449
+    },
+    {
+      "file": "index-wF4kk7W1.js",
+      "bytes": 304102,
+      "gzipBytes": 91842
+    }
+  ],
+  "layoutChecks": [
+    {
+      "width": 320,
+      "language": "en",
+      "path": "courses",
+      "clippedControls": 0
+    },
+    {
+      "width": 320,
+      "language": "en",
+      "path": "learn/N5",
+      "clippedControls": 0
+    },
+    {
+      "width": 320,
+      "language": "en",
+      "path": "practice/N5",
+      "clippedControls": 0
+    },
+    {
+      "width": 320,
+      "language": "en",
+      "path": "studio",
+      "clippedControls": 0
+    },
+    {
+      "width": 320,
+      "language": "si",
+      "path": "courses",
+      "clippedControls": 0
+    },
+    {
+      "width": 320,
+      "language": "si",
+      "path": "learn/N5",
+      "clippedControls": 0
+    },
+    {
+      "width": 320,
+      "language": "si",
+      "path": "practice/N5",
+      "clippedControls": 0
+    },
+    {
+      "width": 320,
+      "language": "si",
+      "path": "studio",
+      "clippedControls": 0
+    },
+    {
+      "width": 320,
+      "language": "ja",
+      "path": "courses",
+      "clippedControls": 0
+    },
+    {
+      "width": 320,
+      "language": "ja",
+      "path": "learn/N5",
+      "clippedControls": 0
+    },
+    {
+      "width": 320,
+      "language": "ja",
+      "path": "practice/N5",
+      "clippedControls": 0
+    },
+    {
+      "width": 320,
+      "language": "ja",
+      "path": "studio",
+      "clippedControls": 0
+    },
+    {
+      "width": 640,
+      "language": "en",
+      "path": "courses",
+      "clippedControls": 0
+    },
+    {
+      "width": 640,
+      "language": "en",
+      "path": "learn/N5",
+      "clippedControls": 0
+    },
+    {
+      "width": 640,
+      "language": "en",
+      "path": "practice/N5",
+      "clippedControls": 0
+    },
+    {
+      "width": 640,
+      "language": "en",
+      "path": "studio",
+      "clippedControls": 0
+    },
+    {
+      "width": 640,
+      "language": "si",
+      "path": "courses",
+      "clippedControls": 0
+    },
+    {
+      "width": 640,
+      "language": "si",
+      "path": "learn/N5",
+      "clippedControls": 0
+    },
+    {
+      "width": 640,
+      "language": "si",
+      "path": "practice/N5",
+      "clippedControls": 0
+    },
+    {
+      "width": 640,
+      "language": "si",
+      "path": "studio",
+      "clippedControls": 0
+    },
+    {
+      "width": 640,
+      "language": "ja",
+      "path": "courses",
+      "clippedControls": 0
+    },
+    {
+      "width": 640,
+      "language": "ja",
+      "path": "learn/N5",
+      "clippedControls": 0
+    },
+    {
+      "width": 640,
+      "language": "ja",
+      "path": "practice/N5",
+      "clippedControls": 0
+    },
+    {
+      "width": 640,
+      "language": "ja",
+      "path": "studio",
+      "clippedControls": 0
+    },
+    {
+      "width": 1440,
+      "language": "en",
+      "path": "courses",
+      "clippedControls": 0
+    },
+    {
+      "width": 1440,
+      "language": "en",
+      "path": "learn/N5",
+      "clippedControls": 0
+    },
+    {
+      "width": 1440,
+      "language": "en",
+      "path": "practice/N5",
+      "clippedControls": 0
+    },
+    {
+      "width": 1440,
+      "language": "en",
+      "path": "studio",
+      "clippedControls": 0
+    },
+    {
+      "width": 1440,
+      "language": "si",
+      "path": "courses",
+      "clippedControls": 0
+    },
+    {
+      "width": 1440,
+      "language": "si",
+      "path": "learn/N5",
+      "clippedControls": 0
+    },
+    {
+      "width": 1440,
+      "language": "si",
+      "path": "practice/N5",
+      "clippedControls": 0
+    },
+    {
+      "width": 1440,
+      "language": "si",
+      "path": "studio",
+      "clippedControls": 0
+    },
+    {
+      "width": 1440,
+      "language": "ja",
+      "path": "courses",
+      "clippedControls": 0
+    },
+    {
+      "width": 1440,
+      "language": "ja",
+      "path": "learn/N5",
+      "clippedControls": 0
+    },
+    {
+      "width": 1440,
+      "language": "ja",
+      "path": "practice/N5",
+      "clippedControls": 0
+    },
+    {
+      "width": 1440,
+      "language": "ja",
+      "path": "studio",
+      "clippedControls": 0
+    }
+  ],
+  "performance": {
+    "lcp": 876,
+    "cls": 0,
+    "longTasks": [
+      50,
+      139,
+      100,
+      263
+    ],
+    "paints": [
+      {
+        "name": "first-paint",
+        "milliseconds": 876
+      },
+      {
+        "name": "first-contentful-paint",
+        "milliseconds": 876
+      }
+    ],
+    "resources": [
+      {
+        "origin": "http://127.0.0.1:4180",
+        "type": "link",
+        "bytes": 36932
+      },
+      {
+        "origin": "http://127.0.0.1:4180",
+        "type": "script",
+        "bytes": 304102
+      },
+      {
+        "origin": "http://127.0.0.1:4180",
+        "type": "link",
+        "bytes": 24810
+      },
+      {
+        "origin": "http://127.0.0.1:4180",
+        "type": "css",
+        "bytes": 129932
+      },
+      {
+        "origin": "http://127.0.0.1:4180",
+        "type": "other",
+        "bytes": 0
+      }
+    ],
+    "videos": 0
+  },
+  "lessonImageBytes": 69224,
+  "shortViewportDialog": "320x568: focus containment, input, submit, Escape and focus restoration passed",
+  "fontFailure": "Lesson remains usable with web-font requests blocked"
+}
