@@ -1,0 +1,30 @@
+{
+  "date": "2026-11-13T07:21:06.829Z",
+  "baseURL": "https://nullvibe-japanese-lms.vercel.app",
+  "browser": "157.0.8103.52",
+  "status": "passed",
+  "checks": [
+    {
+      "width": 360,
+      "headers": "pass",
+      "lessonPersistence": "pass",
+      "assets": 6,
+      "missingAsset": 404
+    },
+    {
+      "width": 768,
+      "headers": "pass",
+      "lessonPersistence": "pass",
+      "assets": 6,
+      "missingAsset": 404
+    },
+    {
+      "width": 1440,
+      "headers": "pass",
+      "lessonPersistence": "pass",
+      "assets": 6,
+      "missingAsset": 404
+    }
+  ],
+  "errors": []
+}

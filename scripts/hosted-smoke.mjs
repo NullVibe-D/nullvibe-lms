@@ -4,8 +4,8 @@ import { mkdir, writeFile } from 'node:fs/promises';
 
 const baseURL = process.argv[2] || process.env.QA_URL;
 assert(baseURL && new URL(baseURL).protocol === 'https:', 'Provide the HTTPS deployment URL');
-const browser = await chromium.launch({ executablePath: process.env.QA_BROWSER || 'C:/Users/Lenovo/AppData/Local/ms-playwright/chromium-1223/chrome-win64/chrome.exe' });
-const report = { date: new Date().toISOString(), baseURL, checks: [], errors: [] };
+const browser = await chromium.launch({ executablePath: process.env.QA_BROWSER || 'C:/Users/Lenovo/AppData/Local/ms-playwright/chromium-1223/chrome-win64/chrome.exe', args: process.env.QA_DISABLE_GPU === '1' ? ['--disable-gpu'] : [] });
+const report = { date: new Date().toISOString(), baseURL, browser: browser.version(), status: 'running', checks: [], errors: [] };
 await mkdir('qa/hosted', { recursive: true });
 try {
   for (const width of [360, 768, 1440]) {
@@ -38,9 +38,14 @@ try {
     report.checks.push({ width, headers: 'pass', lessonPersistence: 'pass', assets: assets.length, missingAsset: 404 });
     await context.close();
   }
+  assert.equal(report.errors.length, 0, JSON.stringify(report.errors));
+  report.status = 'passed';
+} catch (error) {
+  report.status = 'failed';
+  report.failure = error.message;
+  throw error;
 } finally {
   await browser.close();
   await writeFile('qa/hosted/results.json', JSON.stringify(report, null, 2));
 }
-assert.equal(report.errors.length, 0, JSON.stringify(report.errors));
 console.log(JSON.stringify(report, null, 2));

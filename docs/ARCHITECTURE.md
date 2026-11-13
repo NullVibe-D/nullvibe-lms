@@ -1,6 +1,6 @@
 # NullVibe LMS implementation and production plan
 
-Updated 7 November 2026. The delivered application is a local interactive frontend with sample learning content. Live accounts, purchases, private video delivery and generated AI answers require the integrations below.
+Updated 13 November 2026. The delivered application is a hosted interactive frontend with sample learning content at https://nullvibe-japanese-lms.vercel.app. Live accounts, purchases, private video delivery and generated AI answers require the integrations below.
 
 ## Implemented
 
@@ -102,7 +102,7 @@ Cloudflare R2 is a storage candidate with documented free allowances and usage-b
 
 | Slice | Acceptance gate | Current status |
 | --- | --- | --- |
-| Responsive learning prototype | Core flows and multilingual layout verified | Local build |
+| Responsive learning prototype | Core flows and multilingual layout verified | Hosted frontend; see QA.md for test evidence |
 | Authentication and roles | Account lifecycle, session/CSRF tests, staff MFA | Requires provider configuration |
 | Entitlements and payments | Signed webhook, replay/refund/expiry tests | Policy reference and design only |
 | Private media | Unauthorized and expired playback denied, captions, low-bandwidth tests | Requires real media and provider |

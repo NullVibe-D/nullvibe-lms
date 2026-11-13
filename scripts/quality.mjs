@@ -4,6 +4,7 @@ import { gzipSync } from "node:zlib";
 import assert from "node:assert/strict";
 
 const browser = await chromium.launch({
+  args: process.env.QA_DISABLE_GPU === "1" ? ["--disable-gpu"] : [],
   executablePath:
     process.env.QA_BROWSER ||
     "C:/Users/Lenovo/AppData/Local/ms-playwright/chromium-1223/chrome-win64/chrome.exe",
@@ -11,7 +12,8 @@ const browser = await chromium.launch({
 const base = process.env.QA_URL || "http://127.0.0.1:4180";
 const evidence = {
   date: new Date().toISOString(),
-  kind: "Local compiled build; not field performance or physical-device testing",
+  baseURL: base,
+  kind: "Synthetic browser measurement; not field performance or physical-device testing",
   assets: [],
   layoutChecks: [],
   performance: null,

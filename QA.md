@@ -1,20 +1,22 @@
 # NullVibe verification report
 
-7 November 2026 · branch feature/nullvibe-prototype · local compiled preview at http://127.0.0.1:4180.
+13 November 2026 · branch feature/nullvibe-prototype · live preview at https://nullvibe-japanese-lms.vercel.app.
 
 ## Tested scope
 
-This is verification of the interactive frontend and domain policy reference. It is not verification of a deployed LMS, live payments, account authorization or an AI provider. Main remains at 27fa2dc61f742ef9927c5386d3a32af01b8806c3. No deployment or paid service was created.
+This verifies the hosted interactive frontend and the local domain policy reference. Live payments, account authorization and an AI provider are not implemented or verified. The deployed application commit is 0bf2f2adc80d8598ba364fabf826729841551d0a; deployment dpl_5jB3MMm493eugejticKFm7HcUjPH is READY. Main remains at 27fa2dc61f742ef9927c5386d3a32af01b8806c3. No paid service or plan upgrade was activated. See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for the release record.
 
 | Check | Evidence |
 | --- | --- |
 | Production build | Vite build and Sites packaging completed; dist/client/index.html, dist/server/index.js and dist/.openai/hosting.json present |
 | Unit / packaging tests | 12 tests passed: configuration validation, progress/result sanitization, assessment draft consistency, supported routes, entitlement denial cases and static packaging |
-| Browser matrix | Chromium 148.0.7778.96; 320, 360, 768, 1024 and 1440 pixel widths; English, Sinhala and Japanese |
-| Accessibility scans | Catalog, lessons, practice, course details, mentor and staff preview in every size/language, plus answer-review states; exact results in qa/results.json |
+| Browser matrix | Chrome 157.0.8103.52; 320, 360, 768, 1024 and 1440 pixel widths; English, Sinhala and Japanese |
+| Accessibility scans | 96 scans, zero detected violations; catalog, lessons, practice, course details, mentor and staff preview in every size/language, plus answer-review states; exact results in qa/results.json |
+| Functional browser checks | 12 grouped checks passed, zero runtime errors; tested workflows and edge cases are listed below |
 | Layout checks | 36 additional screen/size/language combinations with no controls extending beyond the viewport |
 | Short screen | 320 × 568: dialog focus wrapping, question entry, submit, Escape and return focus passed |
 | Font failure | Lesson flow remains usable with font requests blocked |
+| Hosted smoke checks | 360, 768 and 1440 pixel widths: HTTPS 200, security headers, all requested same-origin assets, lesson completion after refresh, and missing-asset 404; zero console or page errors; qa/hosted/results.json |
 | Dependencies | npm audit reported zero vulnerabilities at verification time |
 | Patch whitespace | git diff --check passed |
 
@@ -33,7 +35,7 @@ This is verification of the interactive frontend and domain policy reference. It
 
 The final bundle contains 304,102 bytes of JavaScript (91,842 gzip) and 24,810 bytes of CSS (6,449 gzip). The lesson illustration is 69,224 bytes. Locally served font files are 36,932 bytes for Latin and 129,932 bytes for Sinhala; Japanese uses system fonts. No external font, video, payment or AI request is needed to use the preview.
 
-A local 360-pixel Chromium sample recorded first contentful paint and largest contentful paint at 876 ms with cumulative layout shift 0. These are single-run local measurements on this workstation, with other QA work running. They are not field Core Web Vitals, mobile-network measurements or a loading-time promise. Raw observations, including long tasks, are retained in qa/quality.json.
+A synthetic 360-pixel Chrome sample against the live URL recorded first contentful paint and largest contentful paint at 2,020 ms, cumulative layout shift 0, and no observed long tasks. This is a single run from this workstation, with other QA work running. It is not field Core Web Vitals, physical-device/mobile-network testing or a loading-time promise. Raw observations are retained in qa/quality.json.
 
 ## Findings fixed during this review
 
@@ -47,7 +49,9 @@ A local 360-pixel Chromium sample recorded first contentful paint and largest co
 8. Kept text fully opaque during motion and respected reduced-motion preferences.
 9. Removed the remote font stylesheet dependency and bundled licensed fonts locally.
 
-The first automated pass sampled opacity transitions before they finished. The final UI uses transform-only motion and the scanner waits for finite animations to settle. A harness error in the additional all-wrong scan was also corrected to use an explicit Playwright browser context; it was not an application error.
+The first local automated pass sampled opacity transitions before they finished. The final UI uses transform-only motion and the scanner waits for finite animations to settle. A harness error in the additional all-wrong scan was also corrected to use an explicit Playwright browser context; it was not an application error.
+
+The initial hosted site served the old lesson-03 landing and omitted the prepared security headers. Publishing the reviewed commit fixed those release issues. During the 13 November checks the bundled Chromium stalled and an Edge attempt encountered a navigation timeout/DNS error. The final runs use installed Chrome in an isolated profile, with GPU disabled through QA_DISABLE_GPU=1. These environment failures are not counted as successful tests. The hosted smoke report now records a failed status and failure reason if an assertion or navigation fails.
 
 ## Limits and remaining launch work
 

@@ -1,6 +1,7 @@
 {
-  "date": "2026-11-07T14:30:15.080Z",
-  "kind": "Local compiled build; not field performance or physical-device testing",
+  "date": "2026-11-13T07:22:12.755Z",
+  "baseURL": "https://nullvibe-japanese-lms.vercel.app",
+  "kind": "Synthetic browser measurement; not field performance or physical-device testing",
   "assets": [
     {
       "file": "index-DkJrgtjj.css",
@@ -232,49 +233,44 @@
     }
   ],
   "performance": {
-    "lcp": 876,
+    "lcp": 2020,
     "cls": 0,
-    "longTasks": [
-      50,
-      139,
-      100,
-      263
-    ],
+    "longTasks": [],
     "paints": [
       {
         "name": "first-paint",
-        "milliseconds": 876
+        "milliseconds": 1520
       },
       {
         "name": "first-contentful-paint",
-        "milliseconds": 876
+        "milliseconds": 2020
       }
     ],
     "resources": [
       {
-        "origin": "http://127.0.0.1:4180",
+        "origin": "https://nullvibe-japanese-lms.vercel.app",
         "type": "link",
         "bytes": 36932
       },
       {
-        "origin": "http://127.0.0.1:4180",
+        "origin": "https://nullvibe-japanese-lms.vercel.app",
         "type": "script",
         "bytes": 304102
       },
       {
-        "origin": "http://127.0.0.1:4180",
+        "origin": "https://nullvibe-japanese-lms.vercel.app",
         "type": "link",
         "bytes": 24810
       },
       {
-        "origin": "http://127.0.0.1:4180",
+        "origin": "https://nullvibe-japanese-lms.vercel.app",
         "type": "css",
         "bytes": 129932
       },
       {
-        "origin": "http://127.0.0.1:4180",
+        "origin": "https://nullvibe-japanese-lms.vercel.app",
         "type": "other",
-        "bytes": 0
+        "bytes": 182
       }
     ],
     "videos": 0

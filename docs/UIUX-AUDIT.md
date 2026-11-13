@@ -1,6 +1,6 @@
 # NullVibe UI/UX audit and fixes
 
-7 November 2026 · local learning prototype · English by default, Sinhala and Japanese selectable.
+13 November 2026 · hosted learning preview at https://nullvibe-japanese-lms.vercel.app · English by default, Sinhala and Japanese selectable. Screenshots were refreshed from the live release.
 
 The revised experience explains where to begin, gives learners a consistent route through lessons and practice, and keeps staff tools out of the primary learner navigation. The white/light-blue visual direction and selected lesson workspace remain intact. A lightweight hiragana card adds visual character to the desktop welcome screen; mobile prioritizes the starting action.
 
@@ -60,7 +60,7 @@ The numeric settings in this screenshot are test inputs, not agreed course prici
 - Local licensed Latin/Sinhala fonts remove the remote stylesheet dependency. Japanese uses system fonts. The preview still works when font loading fails.
 - A 69,224-byte WebP illustration loads on the lesson screen. No background video or animation framework is required.
 
-The checks and actual test counts are in [QA.md](../QA.md), with machine-readable results in [results.json](../qa/results.json) and [quality.json](../qa/quality.json). Automated scans are evidence for tested rules, not a full accessibility certification. Screen-reader sessions, physical iOS/Android devices, teacher review, and production services remain outside this local audit.
+The checks and actual test counts are in [QA.md](../QA.md), with machine-readable results in [results.json](../qa/results.json), [quality.json](../qa/quality.json) and [hosted smoke results](../qa/hosted/results.json). Automated scans are evidence for tested rules, not a full accessibility certification. Screen-reader sessions, physical iOS/Android devices, teacher review, and production services remain outside this frontend audit.
 
 ## Captured baseline
 
